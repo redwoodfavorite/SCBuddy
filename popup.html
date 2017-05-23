@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+  <head>
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <title>Starcraft Player Tracker</title>
+    <link href="./reset.css" rel="stylesheet" type="text/css" />
+    <link href="./style.css" rel="stylesheet" type="text/css" />
+    <script src="./node_modules/axios/dist/axios.min.js"></script>
+    <link href="./node_modules/mdi/css/materialdesignicons.min.css" media="all" rel="stylesheet" type="text/css" />
+    <script src="popup.js"></script>
+  </head>
+  <body>
+    <nav id="app-nav">
+      <ul>
+        <li class="selected"><a href="#">Roster</a></li>
+        <li><a href="#">Matches</a></li>
+      </ul>
+      <i class="mdi mdi-plus" id="add-player"></i>
+    </nav>
+    <div id="players-container">
+      <ul id="players-list">
+        <!-- Players go here -->
+      </ul>
+    </div>
+    <div id="matches-container">
+      <h3 class="hint"> Fetching matches... </h3>
+      <ul id="matches-list">
+        <!-- Matches go here -->
+      </ul>
+    </div>
+    <div id="add-player-container">
+      <center>
+      <div class="add-player-dropdown">
+          <input id="add-player-input" placeholder="Search for a player..."></input>
+          <i class="mdi mdi-magnify input-icon"></i>
+          <ul id="add-player-list"></ul>
+      </div>
+    </center>
+    </div>
+  </body>
+</html>

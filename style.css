@@ -1,0 +1,299 @@
+html, body {
+  font-family: 'Roboto', sans-serif;
+  font-size: 100%;
+  color: #4A4A4A;
+  height: 425px;
+  width: 313px;
+  overflow: hidden;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  outline: none;
+}
+
+select {
+   -webkit-appearance: none;
+   -moz-appearance: none;
+   appearance: none;
+}
+
+input:focus,
+select:focus,
+textarea:focus,
+button:focus {
+    outline: none;
+}
+
+/*
+ * Nav Bar
+ */
+
+#app-nav {
+  background-color: #ECECEC;
+}
+
+#app-nav ul li {
+  display: inline-block;
+  padding: 11px 19px;
+  font-size: 14px;
+  position: relative;
+}
+
+#app-nav ul li.selected a {
+  color: #49BEE2;
+}
+
+#app-nav ul li.selected::after {
+  background-color: #49BEE2;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 0px;
+  content: "";
+  height: 2px;
+  width: 60px;
+}
+
+#app-nav i {
+  position: absolute;
+  color: #9E9E9E;
+  font-size: 25px;
+  right: 10px;
+  top: 4px;
+}
+
+i#add-player:hover {
+  color: black;
+  cursor: pointer;
+}
+
+#players-container, #add-player-container {
+  overflow-y: scroll;
+  height: 388px;
+}
+
+#matches-list {
+  height: 350px;
+  overflow-y: scroll;
+}
+
+#players-container, #matches-container, #add-player-container {
+  display: none;
+}
+
+/*
+ * Add player page
+ */
+
+ .add-player-dropdown {
+   margin-top: 20px;
+ }
+
+.add-player-dropdown input {
+  width: 200px;
+  font-size: 14px;
+  border-style: none;
+  /*color: #9E9E9E;*/
+  padding: 3px;
+  border-bottom: 1px solid #9E9E9E;
+}
+
+.add-player-dropdown input::placeholder {
+  color: #9E9E9E;
+}
+
+.add-player-dropdown .input-icon {
+  font-size: 18px;
+  margin-left: -20px;
+}
+
+select.add-player {
+  width: 150px;
+}
+
+#add-player-container ul {
+  margin-top: 15px;
+}
+
+#add-player-container ul li {
+  padding: 10px;
+  color: #9E9E9E;
+}
+
+li.already-added {
+  color: #4dbc66 !important;
+}
+
+li.already-added::after {
+  content: "\F12C";
+  margin-left: 5px;
+  font-family: "Material Design Icons";
+}
+
+#add-player-container ul li:hover {
+  background-color: #ECECEC;
+  cursor: pointer;
+}
+
+/*
+ * Player container
+ */
+
+li.player {
+  padding: 9px 10px 5px 10px;
+  border-bottom: 1px solid #E7E7E7;
+  position: relative;
+  box-sizing: border-box;
+}
+
+li.player:hover i.remove-player, li.player:hover i.filter-player {
+  visibility: visible;
+}
+
+li.player img.portrait {
+  width: 62px;
+  height: 62px;
+  display: inline-block;
+  margin-right: 10px;
+}
+
+li.player:hover {
+  background-color: #ECECEC;
+  cursor: default;
+}
+
+#players-container li.player:first-child {
+  border-top: 1px solid white;
+}
+
+#players-container li.player:first-child:hover {
+  border-top: 1px solid lightgray;
+}
+
+div.info-container {
+  display: inline-block;
+  width: fill;
+  position: absolute;
+}
+
+.race-portrait {
+  float: left;
+  width: 20px;
+  height: 15px;
+  margin-bottom: 4px;
+}
+
+img.race-portrait--P {
+  margin-right: 5px;
+  content: url(http://www.teamliquid.net/tlpd/images/Picon.png);
+}
+
+img.race-portrait--T {
+  margin-right: 3px;
+  content: url(http://www.teamliquid.net/tlpd/images/Ticon.png);
+}
+
+img.race-portrait--Z {
+  content: url(http://www.teamliquid.net/tlpd/images/Zicon.png);
+  width: 21px;
+  margin-left: -3px;
+  margin-right: 3px;
+}
+
+.info-header {
+  float: left;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+#matches-container .info-header {
+  text-decoration: underline;
+}
+
+.info-subheader {
+  color: #9E9E9E;
+  font-size: 12px;
+  margin-bottom: 4px;
+  display: block;
+  clear: both;
+}
+
+.info-subheader .filter-link {
+  text-decoration: underline;
+}
+
+i.remove-player:hover, i.filter-player {
+  color: black;
+}
+
+i.remove-player, i.filter-player {
+  visibility: hidden;
+  position: absolute;
+  font-size: 22px;
+  cursor: pointer;
+  color: #9E9E9E;
+  top: 8px;
+}
+
+i.remove-player {
+  right: 13px;
+}
+
+i.filter-player {
+  right: 43px;
+}
+
+/*
+ * Match page
+ */
+
+span.filter-tag {
+  background-color: #cbcbcb;
+  border-radius: 3px;
+  padding: 4px 4px;
+  margin-left: 2px;
+  color: white;
+  cursor: pointer;
+}
+
+.filter-close-icon {
+  margin-left: 2px;
+}
+
+span.filter-tag:hover {
+  background-color: #49BEE2;
+}
+
+div.date-container {
+  width: 60px;
+  height: 60px;
+  display: inline-block;
+  margin-right: 10px;
+  margin-left: 2px;
+  text-align: center;
+}
+
+div.date-container__month {
+  font-size: 14px;
+}
+
+div.date-container__day {
+  font-size: 45px;
+}
+
+span.info-subheader b {
+  color: black;
+  font-weight: bold;
+}
+
+h3.hint {
+  padding: 13px 18px;
+  border-bottom: 1px solid #E7E7E7;
+  color: #9E9E9E;
+  font-size: 12px;
+  font-weight: 100;
+  letter-spacing: 0.5px;
+  font-style: italic;
+}
