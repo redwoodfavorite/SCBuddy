@@ -36,17 +36,19 @@ button:focus {
 
 #app-nav ul li {
   display: inline-block;
-  padding: 11px 19px;
+  padding: 11px 18px;
   font-size: 14px;
   position: relative;
 }
 
 #app-nav ul li.selected a {
-  color: #49BEE2;
+  /*color: #49BEE2;*/
+  color: #5297c1;
 }
 
 #app-nav ul li.selected::after {
-  background-color: #49BEE2;
+  /*background-color: #49BEE2;*/
+  background-color: #5297c1;
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
@@ -96,6 +98,7 @@ i#add-player:hover {
   font-size: 14px;
   border-style: none;
   /*color: #9E9E9E;*/
+  /*text-align: center;*/
   padding: 3px;
   border-bottom: 1px solid #9E9E9E;
 }
@@ -206,6 +209,7 @@ img.race-portrait--Z {
   float: left;
   font-size: 14px;
   margin-bottom: 4px;
+  text-decoration: underline;
 }
 
 #matches-container .info-header {
@@ -220,8 +224,9 @@ img.race-portrait--Z {
   clear: both;
 }
 
-.info-subheader .filter-link {
+.info-subheader .filter-link:hover {
   text-decoration: underline;
+  cursor: pointer;
 }
 
 i.remove-player:hover, i.filter-player {
@@ -263,7 +268,8 @@ span.filter-tag {
 }
 
 span.filter-tag:hover {
-  background-color: #49BEE2;
+  /*background-color: #49BEE2;*/
+  background-color: #5297c1;
 }
 
 div.date-container {
@@ -296,4 +302,19 @@ h3.hint {
   font-weight: 100;
   letter-spacing: 0.5px;
   font-style: italic;
+}
+
+/*
+ *
+ */
+
+p#signature {
+  letter-spacing: 3px;
+  padding: 10px;
+  position: fixed;
+  bottom: 0px;
+  right: 0px;
+  cursor: pointer;
+  color: #d3d3d3;
+  font-size: 10px
 }

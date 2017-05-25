@@ -1,9 +1,10 @@
 (function() {
-  let players = []
-  let matches = []
-  let playersToAdd = []
-  // let apiBase = 'http://sample-env.sfshjzcpr2.us-west-2.elasticbeanstalk.com'
-  let apiBase = 'http://localhost:2000'
+  let players = {}
+  let matches = {}
+  let subscriptions = []
+
+  const apiBase = 'http://sample-env.sfshjzcpr2.us-west-2.elasticbeanstalk.com'
+  // const apiBase = 'http://localhost:2000'
 
   window.onload = function() {
     const playersContainer = document.querySelector('#players-container')
@@ -11,7 +12,7 @@
     const matchesContainer = document.querySelector('#matches-container')
     const searchPlayersInput = addPlayerContainer.querySelector('#add-player-input')
     const searchPlayersList = addPlayerContainer.querySelector('#add-player-list')
-    const searchHint = document.querySelector('h3.hint')
+    const searchHint = matchesContainer.querySelector('h3.hint')
 
     const listEls = document.querySelectorAll('#app-nav li')
     listEls.forEach(function(listEl, index) {
@@ -58,14 +59,14 @@
       }
     }
 
-    function renderMatches(i) {
-      const upcomingPlayerMatches = renderMatchList(i)
+    function renderMatches(playerId) {
+      const upcomingPlayerMatches = renderMatchList(playerId)
 
-      if (players[i]) {
+      if (playerId != null) {
         searchHint.innerHTML = (
           `${upcomingPlayerMatches.length} upcoming ` +
           `matches for player: <span class="filter-tag">` +
-          `${players[i].name}<i class="mdi mdi-close filter-close-icon"></i><span>`
+          `${players[playerId].name}<i class="mdi mdi-close filter-close-icon"></i><span>`
         )
 
         /*
@@ -83,23 +84,24 @@
     }
 
     function handleAddPlayerClick(playerToAdd, el) {
-      const alreadyAddedPlayerIndex = players.findIndex(
+      const alreadyAddedPlayer = subscriptions.find(
         (player) => player.id === playerToAdd.id
       )
-      if (alreadyAddedPlayerIndex !== -1) {
-        removePlayerAtIndex(alreadyAddedPlayerIndex)
+
+      if (alreadyAddedPlayer !== undefined) {
+        removePlayerWithId(alreadyAddedPlayer.id)
       } else {
-        players.push(playerToAdd)
+        subscriptions.push(playerToAdd)
         renderPlayers()
         fetchMatches()
 
         chrome.storage.sync.set({
-          players: players
+          subscriptions: subscriptions
         })
       }
 
       // Faster, but less intuitive than calling 'renderPlayersToAdd' here
-      el.className = alreadyAddedPlayerIndex !== -1 ? '' : 'already-added'
+      el.className = alreadyAddedPlayer !== undefined ? '' : 'already-added'
     }
 
     function renderPlayersToAdd() {
@@ -116,7 +118,7 @@
 
       for (var i = 0; i < playerSearchData.length; i++) {
         if (playerSearchData[i].name.indexOf(value) === 0) {
-          if (players.some((player) => player.id === playerSearchData[i].id)) {
+          if (subscriptions.some((player) => player.id === playerSearchData[i].id)) {
             playerSearchData[i].el.className = 'already-added'
           }
           searchPlayersList.appendChild(playerSearchData[i].el)
@@ -127,16 +129,18 @@
       }
     }
 
-    function fetchPlayersToAdd() {
+    function fetchPlayers() {
       return axios.get(apiBase + '/players').then((res) => {
-        const playersToAdd = res.data
+        players = res.data
 
-        playerSearchData = playersToAdd.map(function(playerToAdd, index) {
+        /* Update current subscriptions */
+        chrome.storage.sync.set({ subscriptions: subscriptions.map((sub) => players[sub.id]) })
+
+        playerSearchData = Object.values(players).map((playerToAdd, index) => {
           const li = document.createElement('li')
           li.addEventListener('click', handleAddPlayerClick.bind(null, playerToAdd, li))
           li.setAttribute('value', playerToAdd.id)
           li.innerText = playerToAdd.name
-
           return {
             el: li,
             id: playerToAdd.id,
@@ -151,14 +155,14 @@
     function fetchMatches() {
       return new Promise((res, rej) => {
         axios.post(apiBase + '/players/matches', {
-          players: players.map((p) => parseInt(p.id, 10))
+          players: subscriptions.map(player => player.id)
         })
-        .then(function(result) {
+        .then((result) => {
 
            /* If this request is late and player has been already locally... */
-          if (result.data.length > players.length) {
-            return res(matches)
-          }
+          // if (result.data.length > players.length) {
+            // return res(matches)
+          // }
 
           matches = result.data
           renderPlayers()
@@ -170,9 +174,8 @@
       })
     }
 
-    function renderMatchList(playerIndex) {
-      var matchesList = document.querySelector('#matches-list')
-      var sortedMatches = []
+    function renderMatchList(playerId) {
+      var matchesListEl = document.querySelector('#matches-list')
 
       /*
        * Matches is a nested array. SortedMatches is flattened
@@ -187,35 +190,37 @@
        * Matches = [Array<Match>, Array<Match>]
        *
        */
+      const matchesByPlayer = subscriptions.map(player => matches[player.id])
 
-      matches.forEach(function(matchList, playerIndex) {
+      let sortedMatches = []
 
+      matchesByPlayer.forEach((matchList, playerIndex) => {
+        const playerId = subscriptions[playerIndex].id
         const uniqueMatches = matchList
         .filter((match) => {
           return !sortedMatches.some((addedMatch) => {
             if (match.eventId === addedMatch.eventId) {
-              addedMatch.players.push(playerIndex)
+              addedMatch.players.push(playerId)
               return true
             } else {
               return false
             }
           })
         })
-        .map(function(match) {
-          return Object.assign({
-            players: [playerIndex]
+        .map(match =>
+          Object.assign({
+            players: [playerId]
           }, match)
-        })
+        )
 
         sortedMatches.push.apply(sortedMatches, uniqueMatches)
       })
-      console.log(sortedMatches)
 
       sortedMatches = filterByUpcoming(sortedMatches)
 
-      if (playerIndex != null) {
+      if (playerId != null) {
           sortedMatches = sortedMatches.filter((match) =>
-            match.players.includes(playerIndex))
+            match.players.includes(playerId))
       }
 
       sortedMatches.sort(
@@ -231,7 +236,10 @@
         var day = date.getDate()
         var hour = date.getHours()
         var minutes = date.getMinutes()
-        var playersString = match.players.map((id) => players[id].name).join(', ')
+        var timezone = date.toString().match(/\(([A-Za-z\s].*)\)/)[1]
+        var playersString = match.players.map(
+          (id) => subscriptions.find(player => player.id === id).name
+        ).join(', ')
 
         return (
           `<li class="player">
@@ -242,19 +250,19 @@
             <div class="info-container">
               <h3 class="info-header"><a href="${match.wikiLink}">${match.title}</a></h3>
               <span class="info-subheader">Players: <b>${playersString}</b></span>
-              <span class="info-subheader">${hour % 12}:${minutes < 10 ? `0${minutes}` : minutes} ${hour <= 12 ? 'am' : 'pm'} PDT</div>
+              <span class="info-subheader">${hour % 12}:${minutes < 10 ? `0${minutes}` : minutes} ${hour <= 12 ? 'am' : 'pm'} ${timezone}</div>
             </div>
           </li>`
         )
       }).join('\n')
 
-      matchesList.innerHTML = matchesHTML
+      matchesListEl.innerHTML = matchesHTML
 
       /*
        * Add listeners
        */
 
-      const matchLinkTags = matchesList.querySelectorAll('.info-header a')
+      const matchLinkTags = matchesListEl.querySelectorAll('.info-header a')
       for (let i = 0; i < matchLinkTags.length; i++) {
         matchLinkTags[i].addEventListener('click', (e) => {
           console.log(i)
@@ -268,7 +276,9 @@
 
     function renderPlayers() {
       const playersList = document.querySelector('#players-list')
-      const playersHTML = players.map(function(player, index) {
+      const playersHTML = subscriptions.map((player, index) => {
+        const playerMatches = matches[player.id]
+
         return (
           `<li class="player">
             <img class="portrait" src="http://www.teamliquid.net/tlpd/images/players/${player.tlpdID}.jpg">
@@ -276,15 +286,15 @@
               <img class="race-portrait race-portrait--${player.race}" />
               <h3 class="info-header">${player.name}</h3>
               <span class="info-subheader">
-                <a href="#" class="filter-link">${matches[index] ? `${filterByUpcoming(matches[index]).length} upcoming matches` : 'Loading match data...'}</a>
+                <a href="#" class="filter-link">${playerMatches ? `${filterByUpcoming(playerMatches).length} upcoming matches` : 'Loading match data...'}</a>
               </span>
-              <span class="info-subheader">${player.team}</span>
+              <span class="info-subheader">Team: ${player.team}</span>
             </div>
             <i class="mdi mdi-minus remove-player"></i>
           </li>`
         )
       }).join('')
-      playersList.innerHTML = playersHTML
+      playersList.innerHTML = playersHTML || '<h3 class="hint">Click the "plus" button to add a player!</h3>'
 
       /*
        * Add listeners
@@ -292,19 +302,19 @@
 
       const playerElements = document.querySelectorAll('.player .info-subheader a')
       for (let i = 0; i < playerElements.length; i++) {
-        playerElements[i].addEventListener('click', () => {
+        playerElements[i].addEventListener('click', ((playerId) => {
           selectSection('matches')
-          renderMatches(i)
-        })
+          renderMatches(playerId)
+        }).bind(null, subscriptions[i].id))
       }
 
       const removeIcons = document.querySelectorAll('i.remove-player')
       for (let i = 0; i < removeIcons.length; i++) {
-        removeIcons[i].addEventListener('click', removePlayerAtIndex.bind(null, i))
+        removeIcons[i].addEventListener('click', removePlayerWithId.bind(null, subscriptions[i].id))
       }
     }
 
-    function removePlayerAtIndex(index, e) {
+    function removePlayerWithId(playerId, e) {
 
       /*
        * So it does not trigger click on parent 'li'
@@ -314,40 +324,44 @@
         e.stopPropagation()
       }
 
-      players.splice(index, 1)
-      matches.splice(index, 1)
+      subscriptions = subscriptions.filter((sub) => sub.id !== playerId)
+      delete matches[playerId]
       chrome.storage.sync.set({
-        players, matches
+        subscriptions, matches
       })
       renderPlayers()
       renderMatches()
     }
 
+    fetchPlayers()
+
     Promise.all([
+
       new Promise((res, rej) => {
-        chrome.storage.sync.get('players', function(fetched) {
-          players = fetched.players
-          renderPlayers()
+        chrome.storage.sync.get('subscriptions', fetched => {
+          subscriptions = fetched.subscriptions || []
           res()
         })
       }),
+
       new Promise((res, rej) => {
-        chrome.storage.sync.get('matches', function(fetched) {
-          matches = fetched.matches
+        chrome.storage.sync.get('matches', fetched => {
+          matches = fetched.matches || {}
           res()
         })
       })
     ])
     .then(() => {
-        /* Render players again once matches and data have both been fetched */
-        renderPlayers()
-        renderMatches()
+      /* Render players again once matches and data have both been fetched */
+
+      renderMatches(null)
+      renderPlayers()
+      if (subscriptions.length) {
         fetchMatches()
+      }
     })
 
-    fetchPlayersToAdd()
-
-    selectSection('matches')
+    selectSection('players')
   }
 
   function filterByUpcoming(matches) {

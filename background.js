@@ -1,4 +1,4 @@
-const alarms = [1, 12]
+const alarms = [1, 24]
 const dateOptions = {
   weekday: 'long',
   month: 'long',
