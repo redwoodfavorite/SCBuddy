@@ -11,14 +11,13 @@
   },
   "permissions": [
     "activeTab",
-    "https://ajax.googleapis.com/",
     "storage",
     "notifications",
     "alarms",
     "tabs"
   ],
   "background": {
-    "scripts": ["background.js"],
+    "scripts": ["util.js", "node_modules/axios/dist/axios.min.js","background.js"],
     "persistent": false
   }
 }

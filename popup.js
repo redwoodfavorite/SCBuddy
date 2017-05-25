@@ -190,31 +190,7 @@
        * Matches = [Array<Match>, Array<Match>]
        *
        */
-      const matchesByPlayer = subscriptions.map(player => matches[player.id])
-
-      let sortedMatches = []
-
-      matchesByPlayer.forEach((matchList, playerIndex) => {
-        const playerId = subscriptions[playerIndex].id
-        const uniqueMatches = matchList
-        .filter((match) => {
-          return !sortedMatches.some((addedMatch) => {
-            if (match.eventId === addedMatch.eventId) {
-              addedMatch.players.push(playerId)
-              return true
-            } else {
-              return false
-            }
-          })
-        })
-        .map(match =>
-          Object.assign({
-            players: [playerId]
-          }, match)
-        )
-
-        sortedMatches.push.apply(sortedMatches, uniqueMatches)
-      })
+      let sortedMatches = getUniqueMatchesOfPlayers(matches, subscriptions)
 
       sortedMatches = filterByUpcoming(sortedMatches)
 

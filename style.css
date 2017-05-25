@@ -97,8 +97,9 @@ i#add-player:hover {
   width: 200px;
   font-size: 14px;
   border-style: none;
-  /*color: #9E9E9E;*/
-  /*text-align: center;*/
+  color: #9E9E9E;
+  text-align: center;
+  font-family: 'Roboto';
   padding: 3px;
   border-bottom: 1px solid #9E9E9E;
 }
