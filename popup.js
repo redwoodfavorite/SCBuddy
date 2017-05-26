@@ -3,7 +3,7 @@
   let matches = {}
   let subscriptions = []
 
-  const apiBase = 'http://sample-env.sfshjzcpr2.us-west-2.elasticbeanstalk.com'
+  const apiBase = 'http://Sample-env-1.sfshjzcpr2.us-west-2.elasticbeanstalk.com'
   // const apiBase = 'http://localhost:2000'
 
   window.onload = function() {
@@ -21,6 +21,11 @@
         'click',
         selectSection.bind(null, index ? 'matches' : 'players')
       )
+    })
+
+    document.querySelector('a#signature').addEventListener('click', (e) => {
+      const url = e.target.getAttribute('href')
+      chrome.tabs.create({ url: url })
     })
 
     const addPlayerButton = document.querySelector('#add-player')
@@ -152,7 +157,9 @@
       })
     }
 
-    function fetchMatches() {
+    const fetchMatches = _.debounce(_fetchMatches, 300)
+
+    function _fetchMatches() {
       return new Promise((res, rej) => {
         axios.post(apiBase + '/players/matches', {
           players: subscriptions.map(player => player.id)
@@ -160,11 +167,16 @@
         .then((result) => {
 
            /* If this request is late and player has been already locally... */
-          // if (result.data.length > players.length) {
-            // return res(matches)
-          // }
+          const mergedMatchObject = Object.assign({}, result.data)
 
-          matches = result.data
+          subscriptions.forEach(player => {
+            console.log(mergedMatchObject[player.id], matches[player.id])
+            if (!mergedMatchObject[player.id] && matches[player.id]) {
+              mergedMatchObject[player.id] = matches[player.id]
+            }
+          })
+
+          matches = mergedMatchObject
           renderPlayers()
           renderMatches()
           chrome.storage.sync.set({ matches: matches }, () => {
@@ -205,6 +217,7 @@
           ? 1 : -1
         )
       )
+      const dateNow = new Date()
 
       var matchesHTML = sortedMatches.map((match, index) => {
         var date = new Date(match.timestamp)
@@ -217,6 +230,10 @@
           (id) => subscriptions.find(player => player.id === id).name
         ).join(', ')
 
+        const millisecondsUntilEvent = date.getTime() - dateNow.getTime()
+        const hoursTillEvent = millisecondsUntilEvent / 1000 / 60 / 60
+        const soonTag = hoursTillEvent < 24 ? `<a class="soon-tag">< ${Math.ceil(hoursTillEvent)} hrs</a>` : ''
+
         return (
           `<li class="player">
             <div class="date-container">
@@ -224,7 +241,7 @@
               <div class="date-container__day">${day < 10 ? `0${day}` : day}</div>
             </div>
             <div class="info-container">
-              <h3 class="info-header"><a href="${match.wikiLink}">${match.title}</a></h3>
+              <h3 class="info-header"><a href="${match.wikiLink}">${match.title}</a></h3>${soonTag}
               <span class="info-subheader">Players: <b>${playersString}</b></span>
               <span class="info-subheader">${hour % 12}:${minutes < 10 ? `0${minutes}` : minutes} ${hour <= 12 ? 'am' : 'pm'} ${timezone}</div>
             </div>
@@ -241,7 +258,6 @@
       const matchLinkTags = matchesListEl.querySelectorAll('.info-header a')
       for (let i = 0; i < matchLinkTags.length; i++) {
         matchLinkTags[i].addEventListener('click', (e) => {
-          console.log(i)
           const wikiUrl = matchLinkTags[i].getAttribute('href')
           chrome.tabs.create({ url: wikiUrl })
         })
@@ -301,7 +317,6 @@
       }
 
       subscriptions = subscriptions.filter((sub) => sub.id !== playerId)
-      delete matches[playerId]
       chrome.storage.sync.set({
         subscriptions, matches
       })
@@ -333,7 +348,7 @@
       renderMatches(null)
       renderPlayers()
       if (subscriptions.length) {
-        fetchMatches()
+        _fetchMatches()
       }
     })
 

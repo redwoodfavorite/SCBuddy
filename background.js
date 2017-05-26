@@ -1,5 +1,5 @@
 const alarms = [1, 24]
-const apiBase = 'http://sample-env.sfshjzcpr2.us-west-2.elasticbeanstalk.com'
+const apiBase = 'http://Sample-env-1.sfshjzcpr2.us-west-2.elasticbeanstalk.com'
 
 const dateOptions = {
   weekday: 'long',
@@ -31,7 +31,7 @@ chrome.alarms.onAlarm.addListener((alarm) => {
               : `${playerName}, `)
           .join('')
 
-        const playVerb = match.players.length > 1 ? 'play' : 'play'
+        const playVerb = match.players.length > 1 ? 'play' : 'plays'
 
         const dateNow = new Date()
         const matchTime = new Date(match.timestamp)
@@ -52,7 +52,7 @@ chrome.alarms.onAlarm.addListener((alarm) => {
           contextMessage: new Date(match.timestamp).toLocaleString('en-US', dateOptions),
           buttons: [{ title: 'Liquipedia Page', iconUrl: 'liquipedia_logo.png' }],
           type: 'basic',
-          iconUrl: 'marauder.jpg'
+          iconUrl: 'SCBuddyLogo.png'
         })
       })
     })

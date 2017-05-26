@@ -309,7 +309,7 @@ h3.hint {
  *
  */
 
-p#signature {
+a#signature {
   letter-spacing: 3px;
   padding: 10px;
   position: fixed;
@@ -318,4 +318,16 @@ p#signature {
   cursor: pointer;
   color: #d3d3d3;
   font-size: 10px
+}
+
+a.soon-tag {
+  background-color: darkorange;
+  border-radius: 3px;
+  font-size: 10px;
+  padding: 3px 4px 3px 3px;
+  margin-left: 5px;
+  float: left;
+  font-style: italic;
+  font-family: 'Roboto';
+  color: white;
 }
