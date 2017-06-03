@@ -1,4 +1,4 @@
-const alarms = [1, 24]
+const alarms = [1, 12]
 const apiBase = 'http://Sample-env-1.sfshjzcpr2.us-west-2.elasticbeanstalk.com'
 
 const dateOptions = {
@@ -9,9 +9,12 @@ const dateOptions = {
   minute:'2-digit'
 }
 
-chrome.alarms.onAlarm.addListener((alarm) => {
-  // return
+chrome.alarms.create('fetchAndCheckForNotifications', {
+  when: 0,
+  periodInMinutes: 5
+})
 
+chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === 'fetchAndCheckForNotifications') {
     Promise.all([
       fetchNotifications(),
@@ -52,7 +55,7 @@ chrome.alarms.onAlarm.addListener((alarm) => {
           contextMessage: new Date(match.timestamp).toLocaleString('en-US', dateOptions),
           buttons: [{ title: 'Liquipedia Page', iconUrl: 'liquipedia_logo.png' }],
           type: 'basic',
-          iconUrl: 'SCBuddyLogo.png'
+          iconUrl: 'SCBuddyLogo128.png'
         })
       })
     })
@@ -63,10 +66,6 @@ function getMatchesThatNeedNotifications([notifications, [matches, players]]) {
   const dateNow = new Date()
 
   const uniqueMatches = getUniqueMatchesOfPlayers(matches, players)
-
-  // const flattened = Object.values(matches).reduce((acc, val, i) =>
-  //   ([ ...acc, ...val.map((a) => Object.assign(a, { players: [i] })) ])
-  // , [])
 
   const matchesThatNeedNotifications = uniqueMatches.filter((match) => {
     const matchDate = new Date(match.timestamp)

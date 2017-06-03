@@ -1,5 +1,5 @@
 function getUniqueMatchesOfPlayers(matches, subscriptions) {
-  const matchesByPlayer = subscriptions.map(player => matches[player.id])
+  const matchesByPlayer = subscriptions.map(player => matches[player.id] || [])
 
   let uniqueMatches = []
 

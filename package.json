@@ -1,12 +1,32 @@
 {
   "name": "sc2-chrome-extension",
   "version": "1.0.0",
-  "description": "",
   "main": "popup.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.16.2",
+    "body-parser": "^1.17.1",
+    "build-url": "^1.0.9",
+    "cheerio": "^0.22.0",
+    "express": "^4.15.2",
+    "mdi": "^1.9.33",
+    "request": "^2.81.0",
+    "semantic-ui": "^2.2.10",
+    "underscore": "^1.8.3"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/redwoodfavorite/SCBuddy.git"
+  },
+  "bugs": {
+    "url": "https://github.com/redwoodfavorite/SCBuddy/issues"
+  },
+  "homepage": "https://github.com/redwoodfavorite/SCBuddy#readme",
+  "description": ""
 }

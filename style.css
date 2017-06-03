@@ -320,6 +320,13 @@ a#signature {
   font-size: 10px
 }
 
+#refresh {
+  position: fixed;
+  left: 10px;
+  bottom: 10px;
+  color: #ececec;
+}
+
 a.soon-tag {
   background-color: darkorange;
   border-radius: 3px;

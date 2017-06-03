@@ -23,9 +23,16 @@
       )
     })
 
-    document.querySelector('a#signature').addEventListener('click', (e) => {
+    document.querySelector('#signature').addEventListener('click', (e) => {
       const url = e.target.getAttribute('href')
       chrome.tabs.create({ url: url })
+    })
+
+    document.querySelector('#refresh').addEventListener('click', (e) => {
+      chrome.storage.sync.set({ matches: {}, notifications: {}, subscriptions: [] })
+      subscriptions = [], matches = {}
+      renderMatches()
+      renderPlayers()
     })
 
     const addPlayerButton = document.querySelector('#add-player')
@@ -170,7 +177,6 @@
           const mergedMatchObject = Object.assign({}, result.data)
 
           subscriptions.forEach(player => {
-            console.log(mergedMatchObject[player.id], matches[player.id])
             if (!mergedMatchObject[player.id] && matches[player.id]) {
               mergedMatchObject[player.id] = matches[player.id]
             }

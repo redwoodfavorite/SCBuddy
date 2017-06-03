@@ -4,9 +4,11 @@
   "name": "SCBuddy",
   "description": "Track Starcraft players and receive notifications for their upcoming series.",
   "version": "1.0",
-
+  "icons": {
+    "128": "SCBuddyLogo128.png"
+  },
   "browser_action": {
-    "default_icon": "SCBuddyLogo.png",
+    "default_icon": "SCBuddyLogo128.png",
     "default_popup": "popup.html"
   },
   "permissions": [
