@@ -297,6 +297,12 @@
       /*
        * Add listeners
        */
+      const imageTags = document.querySelectorAll('.player .portrait')
+      for (var i = 0; i < imageTags.length; i++) {
+        imageTags[i].addEventListener('error', e => {
+          e.currentTarget.src = 'http://www.teamliquid.net/images/liquibet/players/noimage.jpg'
+        })
+      }
 
       const playerElements = document.querySelectorAll('.player .info-subheader a')
       for (let i = 0; i < playerElements.length; i++) {

@@ -3,7 +3,7 @@
 
   "name": "SCBuddy",
   "description": "Track Starcraft players and receive notifications for their upcoming series.",
-  "version": "1.0",
+  "version": "1.0.1",
   "icons": {
     "128": "SCBuddyLogo128.png"
   },
