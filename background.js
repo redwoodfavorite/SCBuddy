@@ -1,5 +1,6 @@
 const alarms = [1, 12]
 const apiBase = 'http://Sample-env-1.sfshjzcpr2.us-west-2.elasticbeanstalk.com'
+// const apiBase = 'http://localhost:2000'
 
 const dateOptions = {
   weekday: 'long',
@@ -18,7 +19,6 @@ chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === 'fetchAndCheckForNotifications') {
     Promise.all([
       fetchNotifications(),
-
       fetchSubscriptions()
       .then(fetchMatches),
     ])
@@ -47,13 +47,12 @@ chrome.alarms.onAlarm.addListener((alarm) => {
             ? 1 : -1
           )
         )
-
         // Putting wikiLink in notificationId...
-        chrome.notifications.create(match.wikiLink, {
+        chrome.notifications.create(match.wikiLink + `#${timeUntilEvent}`, {
           title: 'SCBuddy | Upcoming match',
           message: `${playersString} ${playVerb} "${match.title}" in under ${Math.ceil(timeUntilEvent / 1000 / 60 / 60)} hours`,
           contextMessage: new Date(match.timestamp).toLocaleString('en-US', dateOptions),
-          buttons: [{ title: 'Liquipedia Page', iconUrl: 'liquipedia_logo.png' }],
+          // buttons: [{ title: 'Liquipedia Page', iconUrl: 'liquipedia_logo.png' }],
           type: 'basic',
           iconUrl: 'SCBuddyLogo128.png'
         })
@@ -66,21 +65,23 @@ function getMatchesThatNeedNotifications([notifications, [matches, players]]) {
   const dateNow = new Date()
 
   const uniqueMatches = getUniqueMatchesOfPlayers(matches, players)
-
+  const relevantNotifications = getRelevantNotifications(notifications, uniqueMatches)
+  console.log(relevantNotifications)
   const matchesThatNeedNotifications = uniqueMatches.filter((match) => {
     const matchDate = new Date(match.timestamp)
     const timeUntilEvent = matchDate.getTime() - dateNow.getTime()
 
     if (timeUntilEvent < 0) return false
 
-    const eventNotifications = notifications[match.eventId] = notifications[match.eventId] || {}
+    relevantNotifications[match.eventId] = relevantNotifications[match.eventId] || {}
+
     let alarmTriggered = false
     alarms.forEach((alarmTime) => {
       if (
-        eventNotifications[alarmTime] === undefined &&
+        relevantNotifications[match.eventId][alarmTime] === undefined &&
         timeUntilEvent < (alarmTime * 60 * 60 * 1000)
       ) {
-        eventNotifications[alarmTime] = true
+        relevantNotifications[match.eventId][alarmTime] = true
         alarmTriggered = true
       }
     })
@@ -88,9 +89,20 @@ function getMatchesThatNeedNotifications([notifications, [matches, players]]) {
     return alarmTriggered
   })
 
-  chrome.storage.sync.set({ notifications })
+  chrome.storage.sync.set({ notifications: relevantNotifications })
 
   return [matchesThatNeedNotifications, players]
+}
+
+function getRelevantNotifications(notifications, matches) {
+  const validMatchIDs = Object.keys(notifications).filter((matchID) =>
+    matches.some((match) => { return match.eventId === matchID})
+  )
+
+  return validMatchIDs.reduce(
+    (acc, val) => (acc[val] = notifications[val], acc),
+    {}
+  )
 }
 
 /* Make a request request for player matches */
@@ -118,6 +130,11 @@ function fetchSubscriptions() {
     })
   })
 }
+
+chrome.notifications.onClicked.addListener((notificationId, buttonIndex) => {
+  chrome.tabs.create({ url: notificationId })
+  chrome.notifications.clear(notificationId)
+})
 
 chrome.notifications.onButtonClicked.addListener((notificationId, buttonIndex) => {
   chrome.tabs.create({ url: notificationId })

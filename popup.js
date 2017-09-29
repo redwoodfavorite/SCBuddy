@@ -176,6 +176,16 @@
            /* If this request is late and player has been already locally... */
           const mergedMatchObject = Object.assign({}, result.data)
 
+          Object.values(mergedMatchObject).forEach(matchListForPlayer => {
+            console.log(matchListForPlayer)
+            matchListForPlayer.forEach(match => {
+              if (match.wikiLink) {
+                match.wikiLink = match.wikiLink.replace("http://wiki.teamliquid.net/", "")
+              }
+            })
+          })
+          console.log(mergedMatchObject)
+
           subscriptions.forEach(player => {
             if (!mergedMatchObject[player.id] && matches[player.id]) {
               mergedMatchObject[player.id] = matches[player.id]
@@ -247,7 +257,7 @@
               <div class="date-container__day">${day < 10 ? `0${day}` : day}</div>
             </div>
             <div class="info-container">
-              <h3 class="info-header"><a href="${match.wikiLink}">${match.title}</a></h3>${soonTag}
+              <h3 class="info-header"><a href="http://wiki.teamliquid.net/${match.wikiLink}">${match.title}</a></h3>${soonTag}
               <span class="info-subheader">Players: <b>${playersString}</b></span>
               <span class="info-subheader">${hour % 12}:${minutes < 10 ? `0${minutes}` : minutes} ${hour <= 12 ? 'am' : 'pm'} ${timezone}</div>
             </div>
@@ -276,6 +286,14 @@
       const playersList = document.querySelector('#players-list')
       const playersHTML = subscriptions.map((player, index) => {
         const playerMatches = matches[player.id]
+        /*
+         * "-" or "(Unknown/Retired)" team name is rendered as squiggly instead
+         * because it looks better.  TODO: Fix this in DB instead.
+         */
+        const team = (
+          player.team === '-' ||
+          player.team === '(Unknown/Retired)'
+        ) ? '~' : player.team
 
         return (
           `<li class="player">
@@ -286,7 +304,7 @@
               <span class="info-subheader">
                 <a href="#" class="filter-link">${playerMatches ? `${filterByUpcoming(playerMatches).length} upcoming matches` : 'Loading match data...'}</a>
               </span>
-              <span class="info-subheader">Team: ${player.team}</span>
+              <span class="info-subheader">Team: ${team}</span>
             </div>
             <i class="mdi mdi-minus remove-player"></i>
           </li>`
