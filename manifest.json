@@ -18,7 +18,7 @@
     "tabs"
   ],
   "background": {
-    "scripts": ["util.js", "node_modules/axios/dist/axios.min.js","background.js"],
+    "scripts": ["util.js", "node_modules/axios/dist/axios.min.js", "node_modules/normalizr/dist/normalizr.umd.js", "background.js"],
     "persistent": false
   }
 }

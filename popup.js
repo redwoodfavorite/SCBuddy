@@ -177,14 +177,12 @@
           const mergedMatchObject = Object.assign({}, result.data)
 
           Object.values(mergedMatchObject).forEach(matchListForPlayer => {
-            console.log(matchListForPlayer)
             matchListForPlayer.forEach(match => {
               if (match.wikiLink) {
                 match.wikiLink = match.wikiLink.replace("http://wiki.teamliquid.net/", "")
               }
             })
           })
-          console.log(mergedMatchObject)
 
           subscriptions.forEach(player => {
             if (!mergedMatchObject[player.id] && matches[player.id]) {
@@ -195,7 +193,8 @@
           matches = mergedMatchObject
           renderPlayers()
           renderMatches()
-          chrome.storage.sync.set({ matches: matches }, () => {
+          const normalizedMatches = normalizr.normalize(matches, matchListValuesSchema)
+          chrome.storage.sync.set({ matches: normalizedMatches }, () => {
             res(matches)
           })
         })
@@ -348,7 +347,7 @@
 
       subscriptions = subscriptions.filter((sub) => sub.id !== playerId)
       chrome.storage.sync.set({
-        subscriptions, matches
+        subscriptions
       })
       renderPlayers()
       renderMatches()
@@ -367,7 +366,16 @@
 
       new Promise((res, rej) => {
         chrome.storage.sync.get('matches', fetched => {
-          matches = fetched.matches || {}
+          if (fetched.matches) {
+            matches = normalizr.denormalize(
+              fetched.matches.result,
+              matchListValuesSchema,
+              fetched.matches.entities
+            )
+          } else {
+            matches = {}
+          }
+
           res()
         })
       })

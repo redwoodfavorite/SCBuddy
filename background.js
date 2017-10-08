@@ -66,7 +66,6 @@ function getMatchesThatNeedNotifications([notifications, [matches, players]]) {
 
   const uniqueMatches = getUniqueMatchesOfPlayers(matches, players)
   const relevantNotifications = getRelevantNotifications(notifications, uniqueMatches)
-  console.log(relevantNotifications)
   const matchesThatNeedNotifications = uniqueMatches.filter((match) => {
     const matchDate = new Date(match.timestamp)
     const timeUntilEvent = matchDate.getTime() - dateNow.getTime()
