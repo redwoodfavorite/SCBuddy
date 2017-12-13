@@ -1,3 +1,11 @@
+const normalizr = require('normalizr')
+const axios = require('axios')
+const schemas = require('./schemas')
+
+const matchSchema = schemas.matchSchema
+const matchListSchema = schemas.matchListSchema
+const matchListValuesSchema = schemas.matchListValuesSchema
+
 const alarms = [1, 12]
 const apiBase = 'http://Sample-env-1.sfshjzcpr2.us-west-2.elasticbeanstalk.com'
 // const apiBase = 'http://localhost:2000'
@@ -52,7 +60,6 @@ chrome.alarms.onAlarm.addListener((alarm) => {
           title: 'SCBuddy | Upcoming match',
           message: `${playersString} ${playVerb} "${match.title}" in under ${Math.ceil(timeUntilEvent / 1000 / 60 / 60)} hours`,
           contextMessage: new Date(match.timestamp).toLocaleString('en-US', dateOptions),
-          // buttons: [{ title: 'Liquipedia Page', iconUrl: 'liquipedia_logo.png' }],
           type: 'basic',
           iconUrl: 'SCBuddyLogo128.png'
         })

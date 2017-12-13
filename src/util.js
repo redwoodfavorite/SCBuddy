@@ -29,3 +29,18 @@ function getUniqueMatchesOfPlayers(matches, subscriptions) {
   })
   return uniqueMatches
 }
+
+function filterByUpcoming(matches) {
+  return matches.filter((a, b) => {
+    const matchDate = new Date(a.timestamp)
+    const currentDate = new Date()
+    const monthFromNowDate = new Date()
+    monthFromNowDate.setMonth(currentDate.getMonth() + 1)
+    return (
+      (matchDate.getTime() > currentDate.getTime()) &&
+      (matchDate.getTime() < monthFromNowDate.getTime())
+    )
+  })
+}
+
+module.exports = { getUniqueMatchesOfPlayers, filterByUpcoming }
