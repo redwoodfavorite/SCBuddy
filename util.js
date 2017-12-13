@@ -27,6 +27,5 @@ function getUniqueMatchesOfPlayers(matches, subscriptions) {
       uniqueMatchesFromPlayer
     )
   })
-
   return uniqueMatches
 }

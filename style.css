@@ -79,6 +79,7 @@ i#add-player:hover {
 #matches-list {
   height: 350px;
   overflow-y: scroll;
+  background-color: #ececec;
 }
 
 #players-container, #matches-container, #add-player-container {
@@ -146,10 +147,11 @@ li.already-added::after {
  */
 
 li.player {
-  padding: 9px 10px 5px 10px;
+  padding: 9px 0px 0px 0px;
   border-bottom: 1px solid #E7E7E7;
   position: relative;
   box-sizing: border-box;
+  background-color: white;
 }
 
 li.player:hover i.remove-player, li.player:hover i.filter-player {
@@ -161,11 +163,17 @@ li.player img.portrait {
   height: 62px;
   display: inline-block;
   margin-right: 10px;
+  margin-left: 10px;
+  margin-bottom: 5px;
 }
 
 li.player:hover {
-  background-color: #ECECEC;
+  /*background-color: #ECECEC;*/
   cursor: default;
+}
+
+#players-container {
+  background-color: #ececec;
 }
 
 #players-container li.player:first-child {
@@ -209,7 +217,7 @@ img.race-portrait--Z {
 .info-header {
   float: left;
   font-size: 14px;
-  margin-bottom: 4px;
+  margin-bottom: 7px;
   text-decoration: underline;
 }
 
@@ -220,7 +228,7 @@ img.race-portrait--Z {
 .info-subheader {
   color: #9E9E9E;
   font-size: 12px;
-  margin-bottom: 4px;
+  margin-bottom: 5px;
   display: block;
   clear: both;
 }
@@ -278,7 +286,8 @@ div.date-container {
   height: 60px;
   display: inline-block;
   margin-right: 10px;
-  margin-left: 2px;
+  margin-left: 12px;
+  margin-bottom: 5px;
   text-align: center;
 }
 

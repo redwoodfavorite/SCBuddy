@@ -3,8 +3,8 @@
   let matches = {}
   let subscriptions = []
 
-  const apiBase = 'http://Sample-env-1.sfshjzcpr2.us-west-2.elasticbeanstalk.com'
-  // const apiBase = 'http://localhost:2000'
+  // const apiBase = 'http://Sample-env-1.sfshjzcpr2.us-west-2.elasticbeanstalk.com'
+  const apiBase = 'http://localhost:2000'
 
   window.onload = function() {
     const playersContainer = document.querySelector('#players-container')
@@ -260,6 +260,42 @@
               <span class="info-subheader">Players: <b>${playersString}</b></span>
               <span class="info-subheader">${hour % 12}:${minutes < 10 ? `0${minutes}` : minutes} ${hour <= 12 ? 'am' : 'pm'} ${timezone}</div>
             </div>
+            <div style="
+                            height: 36px;
+                            height: 56px;
+                            background: #f7f7f7;
+                            z-index: 3;
+                            border-top: 1px solid #f4f4f4;
+                                    "><div style="
+                            margin-top: 10px;
+                            margin-left: 6px;
+                        "><ul style="
+                            font-family: &quot;Material Icons&quot;;
+                            font-size: 16px;
+                            margin-right: 6px;
+                            margin-left: 12px;
+                            display: inline-block;
+                            float: left;
+                            text-align: right;
+                            width: 57px;
+                            clear: none;
+                            color: #9E9E9E;
+                        "><li style="margin-bottom: 5px;">tv</li><li style ="font-family: 'Roboto';
+                        font-size: 12px;
+                        color: black;"
+>Streams</li></ul><ul style="
+                            font-size: 12px;
+                            color: #9E9E9E;
+                            margin: 0px;
+                            line-height: 17px;
+                            display: inline-block;
+                            float: left;
+                            clear: none;
+            "
+"><li style="margin-bottom: 2px;">${match.streams ? match.streams.length : 0} Streams and ${match.vods ? match.vods.length : 0} VOD sources</li>
+<li><a href="www.twitch.tv/basetradetv">BaseTradeTV</a></li>
+</ul>
+</div>
           </li>`
         )
       }).join('\n')
@@ -394,7 +430,8 @@
   }
 
   function filterByUpcoming(matches) {
-    return matches.filter(function(a, b) {
+
+    return matches.filter((a, b) => {
       const matchDate = new Date(a.timestamp)
       const currentDate = new Date()
       const monthFromNowDate = new Date()
