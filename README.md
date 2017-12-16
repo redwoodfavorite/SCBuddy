@@ -12,4 +12,6 @@ Chrome extension.  Follow Starcraft players and receive notifications for upcomi
 
 ![Add Players](https://imgur.com/tX9CTL3.png)
 
-All data fetched from Teamliquid.net (calendar and HotS database) and Liquipedia
+All data fetched from Teamliquid.net (calendar and HotS database) and Liquipedia.
+
+Comments / issues direct message me on reddit: `josieboyy`
