@@ -14,19 +14,18 @@ module.exports = class MatchListItem extends React.Component {
 
     return (
       <div className="match-extras-container">
-        <ul className="match-extras-title-list">
-          <li style={{ marginBottom: 5, marginTop: -2 }}>tv</li>
-        </ul>
-        <ul className="match-extras-content-list" style={{ marginBottom: 9 }}>
-          <li style={{ marginBottom: 2 }}>
-            <a
-              href="#"
-              onClick={() => { this.setState({ expanded: true }) }}
-            >
-              {`${match.streams ? match.streams.length : 0} Streams and ${match.vods ? match.vods.length : 0} VOD sources`}
-            </a>
-          </li>
-        </ul>
+        <div className="match-extras-title-list">
+          <span className="match-extras-label" style={{ fontFamily: 'Material Icons', fontSize: 16, marginTop: -2, paddingTop: -2, color: '#bababa' }}>tv</span>
+          <p
+            className="match-extras-content"
+            style={{ marginBottom: 6 }}
+            onClick={() => this.setState({ expanded: true })}
+          >
+              <a className="stream-vod-link">
+                {`${match.streams ? match.streams.length : 0} Streams and ${match.vods ? match.vods.length : 0} VOD sources`}
+              </a>
+          </p>
+        </div>
       </div>
     )
   }
@@ -36,55 +35,56 @@ module.exports = class MatchListItem extends React.Component {
 
     return (
       <div className="match-extras-container">
-        <ul className="match-extras-title-list">
-          <li style={{ marginBottom: 7 }} className="match-extras-title-text">Streams</li>
-          <li className="match-extras-title-text">VODs</li>
-        </ul>
-        <ul className="match-extras-content-list">
-          {(match.streams && match.streams.length)
-            ? (
+        <div className="match-extras-title-list">
+          <span className="match-extras-label">Streams</span>
+          <p className="match-extras-content">
+            {(match.streams && match.streams.length)
+              ? (
               match.streams.map((stream, i) => (
-                <li key={`stream-${i}`} style={{ marginBottom: 7 }}>
-                  <a
-                    href="#"
-                    onClick={() => {
-                      chrome.tabs.create({
-                        url: match.streams[0].href
-                      })
-                    }}
-                  >
-                    {stream.title}
-                  </a>
-                </li>))
-            ) : (
-              <li style={{ marginBottom: 7 }}>
-                <a>N/A</a>
-              </li>
-            )
-          }
-          {(match.vods && match.vods.length)
-            ? (
-              match.vods.map((vod, i) => (
-                <li key={`vod-${i}`} style={{ marginBottom: 12 }}>
-                  <a
-                    href="#"
-                    onClick={() => {
-                      chrome.tabs.create({
-                        url: vod.href
-                      })
-                    }}
-                  >
-                    {vod.title}
-                  </a>
-                </li>
+                <a
+                  key={`stream-${i}`}
+                  href="#"
+                  className="stream-vod-link"
+                  style={{ marginRight: 4 }}
+                  onClick={() => {
+                    chrome.tabs.create({
+                      url: stream.href
+                    })
+                  }}
+                >
+                  {stream.title + (i === (match.streams.length - 1) ? " " : ", ")}
+                </a>
               ))
             ) : (
-              <li style={{ marginBottom: 12 }}>
-                <a>N/A</a>
-              </li>
-            )
-          }
-        </ul>
+              <a>~</a>
+            )}
+          </p>
+        </div>
+        <div className="match-extras-title-list" style={{ marginBottom: 6 }}>
+          <span className="match-extras-label">VODs</span>
+          <p className="match-extras-content">
+            {(match.vods && match.vods.length)
+              ? (
+                match.vods.map((vod, i) => (
+                  <a
+                      href="#"
+                      key={i}
+                      className="stream-vod-link"
+                      onClick={() => {
+                        chrome.tabs.create({
+                          url: vod.href
+                        })
+                      }}
+                    >
+                    {vod.title + (i === (match.vods.length - 1) ? " " : ", ")}
+                  </a>
+                ))
+              ) : (
+                <a>~</a>
+              )
+            }
+          </p>
+        </div>
       </div>
     )
   }
@@ -105,8 +105,8 @@ module.exports = class MatchListItem extends React.Component {
 
     const millisecondsUntilEvent = date.getTime() - dateNow.getTime()
     const hoursTillEvent = millisecondsUntilEvent / 1000 / 60 / 60
-    const soonTag = hoursTillEvent < 24
-      && <a className="soon-tag">{`${Math.ceil(hoursTillEvent)} hrs`}</a>
+    const soonTag = hoursTillEvent < 24 && hoursTillEvent > 0
+      && <a className="soon-tag">{`< ${Math.ceil(hoursTillEvent)} hrs`}</a>
 
     return (
       <li className="player">
@@ -116,7 +116,15 @@ module.exports = class MatchListItem extends React.Component {
         </div>
         <div className="info-container">
           <h3 className="info-header">
-            <a href={`http://wiki.teamliquid.net/${match.wikiLink}`}>{match.title}</a>
+            <a
+              onClick={() => {
+                chrome.tabs.create({
+                  url: `http://wiki.teamliquid.net/${match.wikiLink}`
+                })
+              }}
+              href="#">
+              {match.title}
+            </a>
           </h3>
           {soonTag}
           <span className="info-subheader">Players: <b>{playersString}</b></span>

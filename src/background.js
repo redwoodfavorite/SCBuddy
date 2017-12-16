@@ -1,13 +1,11 @@
 const normalizr = require('normalizr')
 const axios = require('axios')
-const schemas = require('./schemas')
+const util = require('./util')
 
-const matchSchema = schemas.matchSchema
-const matchListSchema = schemas.matchListSchema
-const matchListValuesSchema = schemas.matchListValuesSchema
+const getUniqueMatchesOfPlayers = util.getUniqueMatchesOfPlayers
 
 const alarms = [1, 12]
-const apiBase = 'http://Sample-env-1.sfshjzcpr2.us-west-2.elasticbeanstalk.com'
+const apiBase = 'http://scbuddy.us-west-2.elasticbeanstalk.com'
 // const apiBase = 'http://localhost:2000'
 
 const dateOptions = {

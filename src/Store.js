@@ -12,8 +12,8 @@ const matchSchema = schemas.matchSchema
 const matchListSchema = schemas.matchListSchema
 const matchListValuesSchema = schemas.matchListValuesSchema
 
-// const apiBase = 'http://Sample-env-1.sfshjzcpr2.us-west-2.elasticbeanstalk.com'
-const apiBase = 'http://localhost:2000'
+const apiBase = 'http://scbuddy.us-west-2.elasticbeanstalk.com'
+// const apiBase = 'http://localhost:2000'
 
 class Store extends React.Component {
 
@@ -37,23 +37,6 @@ class Store extends React.Component {
           this.setState({ subscriptions })
           res(subscriptions)
         })
-      }),
-
-      new Promise((res, rej) => {
-        chrome.storage.sync.get('matches', fetched => {
-          var matches = {}
-          if (fetched.matches) {
-            matches = normalizr.denormalize(
-              fetched.matches.result,
-              matchListValuesSchema,
-              fetched.matches.entities
-            )
-          } else {
-            matches = {}
-          }
-          this.setState({ matches })
-          res(matches)
-        })
       })
     ])
     .then(([subscriptions, matches]) => {
@@ -75,7 +58,7 @@ class Store extends React.Component {
       this.setState({
         subscriptions
       })
-      this.fetchMatches()
+      this.fetchMatchForPlayer(playerToAdd.id)
 
       chrome.storage.sync.set({
         subscriptions
@@ -89,7 +72,9 @@ class Store extends React.Component {
 
       /* Update current subscriptions */
       chrome.storage.sync.set({
-        subscriptions: this.state.subscriptions.map((sub) => this.state.players[sub.id])
+        subscriptions: this.state.subscriptions
+          .filter(sub => sub)
+          .map((sub) => this.state.players[sub.id])
       })
     })
   }
@@ -107,53 +92,63 @@ class Store extends React.Component {
     chrome.storage.sync.set({ matches: {}, notifications: {}, subscriptions: [] })
   }
 
-  _fetchMatches() {
-    return new Promise((res, rej) => {
-      axios.post(apiBase + '/players/matches', {
-        players: this.state.subscriptions.map(player => player.id)
-      })
-      .then((result) => {
+  fetchMatchForPlayer(playerId) {
+    return axios.post(apiBase + '/players/matches', {
+      players: [playerId]
+    })
+    .then((result) => {
 
-         /* If this request is late and player has been already locally... */
-        const mergedMatchObject = Object.assign({}, result.data)
+       /* If this request is late and player has been already locally... */
+      const mergedMatchObject = Object.assign({}, result.data)
 
-        Object.values(mergedMatchObject).forEach(matchListForPlayer => {
-          matchListForPlayer.forEach(match => {
-            if (match.wikiLink) {
-              match.wikiLink = match.wikiLink.replace('http://wiki.teamliquid.net/', '')
-            }
-          })
-        })
-
-        this.state.subscriptions.forEach(player => {
-          if (!mergedMatchObject[player.id] && this.state.matches[player.id]) {
-            mergedMatchObject[player.id] = this.state.matches[player.id]
+      Object.values(mergedMatchObject).forEach(matchListForPlayer => {
+        matchListForPlayer.forEach(match => {
+          if (match.wikiLink) {
+            match.wikiLink = match.wikiLink.replace('http://wiki.teamliquid.net/', '')
           }
         })
-
-        this.setState({ matches: mergedMatchObject })
-
-        const normalizedMatches = normalizr.normalize(
-          this.state.matches,
-          matchListValuesSchema
-        )
-
-        chrome.storage.sync.set({ matches: normalizedMatches }, () => {
-          res(this.state.matches)
-        })
       })
+
+      this.state.subscriptions.forEach(player => {
+        if (!mergedMatchObject[player.id] && this.state.matches[player.id]) {
+          mergedMatchObject[player.id] = this.state.matches[player.id]
+        }
+      })
+
+      this.setState({ matches: mergedMatchObject })
+
+      const normalizedMatches = normalizr.normalize(
+        this.state.matches,
+        matchListValuesSchema
+      )
+
+      return this.state.matches
     })
+  }
+
+  _fetchMatches() {
+      return Promise.all(this.state.subscriptions.map(player =>
+        this.fetchMatchForPlayer(player.id)
+      ))
   }
 
   render() {
     const RootComponent = this.props.RootComponent
 
-    var upcomingMatches = getUniqueMatchesOfPlayers(
+    var matches = getUniqueMatchesOfPlayers(
       this.state.matches,
       this.state.subscriptions
     )
 
-    upcomingMatches = filterByUpcoming(upcomingMatches)
+    var previousMatches = filterByUpcoming(matches, true)
+    previousMatches.sort(
+      (a, b) => (
+        new Date(a.timestamp).getTime() < new Date(b.timestamp).getTime()
+        ? 1 : -1
+      )
+    )
+
+    var upcomingMatches = filterByUpcoming(matches)
     upcomingMatches.sort(
       (a, b) => (
         new Date(a.timestamp).getTime() > new Date(b.timestamp).getTime()
@@ -167,6 +162,7 @@ class Store extends React.Component {
       <App
         subscriptions={this.state.subscriptions}
         upcomingMatches={upcomingMatches}
+        previousMatches={previousMatches}
         matches={this.state.matches}
         players={this.state.players}
         addPlayerAction={this.addPlayer.bind(this)}

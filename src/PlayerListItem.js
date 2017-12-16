@@ -31,16 +31,27 @@ module.exports = function PlayerListItem(props) {
         <h3 className="info-header">{player.name}</h3>
         <span className="info-subheader">
           <a
-            onClick={props.onFilterByPlayer}
+            onClick={props.onFilterByPlayerUpcoming}
             className="filter-link"
           >
             {(playerMatches
-              ? `${filterByUpcoming(playerMatches).length} upcoming matches`
-              : 'Loading match data...'
+              ? `${filterByUpcoming(playerMatches).length} upcoming`
+              : 'Fetching matches...'
             )}
           </a>
         </span>
-        <span className="info-subheader">{`Team: ${team}`}</span>
+        <span className="info-subheader">
+          <a
+            onClick={props.onFilterByPlayerPrevious}
+            className="filter-link"
+          >
+            {(playerMatches
+              ? `${filterByUpcoming(playerMatches, true).length} previous`
+              : ''
+            )}
+          </a>
+        </span>
+        {/* <span className="info-subheader">{`Team: ${team}`}</span> */}
       </div>
       <i
         className="mdi mdi-minus remove-player"

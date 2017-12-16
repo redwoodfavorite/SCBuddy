@@ -30,12 +30,24 @@ function getUniqueMatchesOfPlayers(matches, subscriptions) {
   return uniqueMatches
 }
 
-function filterByUpcoming(matches) {
+function filterByUpcoming(matches, byPastInsteadLol) {
   return matches.filter((a, b) => {
     const matchDate = new Date(a.timestamp)
     const currentDate = new Date()
+
+    if (byPastInsteadLol) {
+      const monthAgoDate = new Date()
+      monthAgoDate.setMonth(currentDate.getMonth() - 1)
+
+      return (
+        (matchDate.getTime() < currentDate.getTime()) &&
+        (matchDate.getTime() > monthAgoDate.getTime())
+      )
+    }
+
     const monthFromNowDate = new Date()
     monthFromNowDate.setMonth(currentDate.getMonth() + 1)
+
     return (
       (matchDate.getTime() > currentDate.getTime()) &&
       (matchDate.getTime() < monthFromNowDate.getTime())
